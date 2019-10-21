@@ -1,6 +1,7 @@
-module statemachine(clk, reset, instruction, pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn);
+module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn);
 	input clk, reset;
 	input [15:0] instruction;
+	output reg [3:0] aluControl;
 	output reg [1:0] pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn;
 	reg [5:0] PS, NS;
 	// parameter [5:0] S0 = 6'd0, S1 = 4'b0001, S2 = 4'b0010, S3 = 4'b0011, S4 = 4'b0100, S5 = 4'b0101, S6 = 4'b0110, S7 = 4'b0111, S8 = 4'b1000;
@@ -24,32 +25,39 @@ module statemachine(clk, reset, instruction, pcRegEn, srcRegEn, dstRegEn, immReg
 		case(instruction)
 			S0: begin
 				if (instruction[15:12] == 0000) begin // Register
-					if (instruction[7:4] == 0101) // ADD
+					if (instruction[7:4] == 0101) begin // ADD
 						srcRegEn = 1;
 						dstRegEn = 1;
 						NS <= S1;
-					if (instruction[7:4] == 1001) // SUB
+					end
+					if (instruction[7:4] == 1001) begin // SUB
 						srcRegEn = 1;
 						dstRegEn = 1;
 						NS <= S2;
-					if (instruction[7:4] == 1011) // CMP
+					end
+					if (instruction[7:4] == 1011) begin // CMP
 						srcRegEn = 1;
 						dstRegEn = 1;
 						NS <= S3;
-					if (instruction[7:4] == 0001) // AND
+					end
+					if (instruction[7:4] == 0001) begin // AND
 						srcRegEn = 1;
 						dstRegEn = 1;
 						NS <= S4;
-					if (instruction[7:4] == 0010) // OR
+					end
+					if (instruction[7:4] == 0010) begin // OR
 						srcRegEn = 1;
 						dstRegEn = 1;
 						NS <= S5;
-					if (instruction[7:4] == 0011) // XOR
+					end
+					if (instruction[7:4] == 0011) begin // XOR
 						srcRegEn = 1;
 						dstRegEn = 1;
 						NS <= S6;
-					if (instruction[7:4] == 1101) // MOV
+					end
+					if (instruction[7:4] == 1101) begin // MOV
 						NS <= S7;
+					end
 				end
 				
 				if (instruction[15:12] == 0100) begin // Special
@@ -74,27 +82,51 @@ module statemachine(clk, reset, instruction, pcRegEn, srcRegEn, dstRegEn, immReg
 				
 				if (instruction[15:12] == 1100) // Bcond
 					NS <= S15;
-				if (instruction[15:12] == 0001) // ANDI
+				if (instruction[15:12] == 0001) begin // ANDI
+					immRegEn = 1;
+					dstRegEn = 1;
 					NS <= S16;
-				if (instruction[15:12] == 0010) // ORI
+				end
+				if (instruction[15:12] == 0010) begin // ORI
+					immRegEn = 1;
+					dstRegEn = 1;
 					NS <= S17;
-				if (instruction[15:12] == 0011) // XORI
+				end
+				if (instruction[15:12] == 0011) begin // XORI
+					immRegEn = 1;
+					dstRegEn = 1;
 					NS <= S18;
-				if (instruction[15:12] == 0101) // ADDI
+				end
+				if (instruction[15:12] == 0101) begin // ADDI
+					immRegEn = 1;
+					dstRegEn = 1;
 					NS <= S19;
-				if (instruction[15:12] == 1001) // SUBI
+				end
+				if (instruction[15:12] == 1001) begin // SUBI
+					immRegEn = 1;
+					dstRegEn = 1;
 					NS <= S20;
-				if (instruction[15:12] == 1011) // CMPI
+				end
+				if (instruction[15:12] == 1011) begin // CMPI
+					immRegEn = 1;
+					dstRegEn = 1;
 					NS <= S21;
-				if (instruction[15:12] == 1101) // MOVI
+				end
+				if (instruction[15:12] == 1101) begin // MOVI
+					immRegEn = 1;
+					dstRegEn = 1;
 					NS <= S22;
-				if (instruction[15:12] == 1111) // LUI
+				end
+				if (instruction[15:12] == 1111) begin // LUI
+					immRegEn = 1;
+					dstRegEn = 1;
 					NS <= S23;
+				end
 			end
 					
 			S1: begin // ADD
 				regFileEn = 1;
-				pcREgMuxEn = 1;
+				pcRegMuxEn = 1;
 				aluControl = 0000;
 				shiftALUMuxEn = 0;
 				resultRegEn = 1;
@@ -103,7 +135,7 @@ module statemachine(clk, reset, instruction, pcRegEn, srcRegEn, dstRegEn, immReg
 			
 			S2: begin // SUB
 				regFileEn = 1;
-				pcREgMuxEn = 1;
+				pcRegMuxEn = 1;
 				aluControl = 0001;
 				shiftALUMuxEn = 0;
 				resultRegEn = 1;
@@ -112,7 +144,7 @@ module statemachine(clk, reset, instruction, pcRegEn, srcRegEn, dstRegEn, immReg
 			
 			S3: begin // CMP
 				regFileEn = 1;
-				pcREgMuxEn = 1;
+				pcRegMuxEn = 1;
 				aluControl = 0010;
 				shiftALUMuxEn = 0;
 				resultRegEn = 1;
@@ -121,7 +153,7 @@ module statemachine(clk, reset, instruction, pcRegEn, srcRegEn, dstRegEn, immReg
 			
 			S4: begin // AND
 				regFileEn = 1;
-				pcREgMuxEn = 1;
+				pcRegMuxEn = 1;
 				aluControl = 0011;
 				shiftALUMuxEn = 0;
 				resultRegEn = 1;
@@ -130,7 +162,7 @@ module statemachine(clk, reset, instruction, pcRegEn, srcRegEn, dstRegEn, immReg
 			
 			S5: begin // OR
 				regFileEn = 1;
-				pcREgMuxEn = 1;
+				pcRegMuxEn = 1;
 				aluControl = 0100;
 				shiftALUMuxEn = 0;
 				resultRegEn = 1;
@@ -139,7 +171,7 @@ module statemachine(clk, reset, instruction, pcRegEn, srcRegEn, dstRegEn, immReg
 			
 			S6: begin // XOR
 				regFileEn = 1;
-				pcREgMuxEn = 1;
+				pcRegMuxEn = 1;
 				aluControl = 0101;
 				shiftALUMuxEn = 0;
 				resultRegEn = 1;
@@ -148,7 +180,7 @@ module statemachine(clk, reset, instruction, pcRegEn, srcRegEn, dstRegEn, immReg
 			
 			S7: begin // MOV
 				regFileEn = 1;
-				pcREgMuxEn = 1;
+				pcRegMuxEn = 1;
 				aluControl = 0110;
 				shiftALUMuxEn = 0;
 				resultRegEn = 1;
@@ -188,36 +220,73 @@ module statemachine(clk, reset, instruction, pcRegEn, srcRegEn, dstRegEn, immReg
 			end
 			
 			S16: begin // ANDI
-			
+				regFileEn = 1;
+				pcRegMuxEn = 1;
+				aluControl = 0011;
+				shiftALUMuxEn = 0;
+				resultRegEn = 1;
+				NS <= 0; 
 			end
 			
 			S17: begin // ORI
-			
+				regFileEn = 1;
+				pcRegMuxEn = 1;
+				aluControl = 0100;
+				shiftALUMuxEn = 0;
+				resultRegEn = 1;
+				NS <= 0;
 			end
 			
 			S18: begin // XORI
-			
+				regFileEn = 1;
+				pcRegMuxEn = 1;
+				aluControl = 0101;
+				shiftALUMuxEn = 0;
+				resultRegEn = 1;
+				NS <= 0;
 			end
 			
 			S19: begin // ADDI
-			
+				regFileEn = 1;
+				pcRegMuxEn = 1;
+				aluControl = 0000;
+				shiftALUMuxEn = 0;
+				resultRegEn = 1;
+				NS <= 0; 
 			end
 			
 			S20: begin // SUBI
-			
+				regFileEn = 1;
+				pcRegMuxEn = 1;
+				aluControl = 0001;
+				shiftALUMuxEn = 0;
+				resultRegEn = 1;
+				NS <= 0; 
 			end
 			
 			S21: begin // CMPI
-			
+				regFileEn = 1;
+				pcRegMuxEn = 1;
+				aluControl = 0010;
+				shiftALUMuxEn = 0;
+				resultRegEn = 1;
+				NS <= 0;
 			end
 			
 			S22: begin // MOVI
-			
+				regFileEn = 1;
+				pcRegMuxEn = 1;
+				aluControl = 0011;
+				shiftALUMuxEn = 0;
+				resultRegEn = 1;
+				NS <= 0;
 			end
 			
 			S23: begin // LUI
 			
 			end
+			
+			
 			
 			S24: begin // LUI
 			
