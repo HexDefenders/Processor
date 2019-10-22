@@ -1,8 +1,8 @@
-module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, memread, memwrite, writedata);
+module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, regFileResultCont, memread, memwrite, writedata);
 	input clk, reset;
 	input [15:0] instruction;
 	output reg [3:0] aluControl;
-	output reg [1:0] pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn;
+	output reg [1:0] pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, regFileResultCont;
 	output reg memread, memwrite;
 	output reg [15:0] writedata;
 	reg [5:0] PS, NS;
@@ -207,7 +207,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 			end
 			
 			S9: begin // STOR
-				regFileEn <= 1;
+				regFileEn <= 0;
 				memread <= 0;
 				memwrite <= 1;
 				writedata <= 1;

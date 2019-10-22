@@ -1,9 +1,11 @@
-module dataPath(clk, instruction, aluControl, pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn);
+module dataPath(clk, instruction, memdata, aluControl, regFileResultCont, pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn);
 	input clk;
-	input [15:0] instruction;
+	input [15:0] instruction, memdata;
 	input [3:0] aluControl;
-	input [1:0] pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn;
-	wire pc, src, dst, imm, result;
+	//why are some mux 2 control signals 2 bits?
+	input [1:0] pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, regFileResultCont;
+	wire pc, src, dst, imm;
+	wire [15:0] result, regFileResult;
 	wire C, L, F, Z, N;
 	
 	instructionRegister instructionRegister(instruction, s, OpCode, Rdest, OpCodeExt, Rsrc, instImm);
@@ -14,7 +16,7 @@ module dataPath(clk, instruction, aluControl, pcRegEn, srcRegEn, dstRegEn, immRe
 	register immReg(instImm, immRegEn, clk, imm); // imm
 	register resultReg(shiftOrALU, resultRegEn, clk, result); //result
 	
-	regfile regFile(clk, regFileEn, src, dst, result, regOut1, regOut2);
+	regfile regFile(clk, regFileEn, src, dst, regFileResult, regOut1, regOut2);
 	
 	signExtend signExtend(imm, signEn, signOut);
 	
@@ -29,5 +31,10 @@ module dataPath(clk, instruction, aluControl, pcRegEn, srcRegEn, dstRegEn, immRe
 	shifter shifter(regOut2, regOrImm, shiftOut);
 	
 	mux2 shiftOrALUMux(aluResult, shiftOut, shiftALUMuxEn, shiftOrALU);
+	
+	//Mux to choose regfile's write data
+	//Note: d2 and d3 are extra inputs for testing and debugging
+	mux4 RegFileResult(.d0(result), .d1(memdata), .d2(0), .d3(1), .s(regFileResultCont), .y(regFileResult));
+	
 
 endmodule 
