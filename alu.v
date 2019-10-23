@@ -12,17 +12,7 @@ module alu(a, b, aluControl, C, L, F, Z, N, result);
 		N = 0;
 		result = 4'd0;
 		case(aluControl) 
-			4'b0000: begin //ADD or ADDI
-				result = a + b; 
-				if (result < b || result < a) begin
-					C = 1;
-					F = 1;
-				end
-				else begin 
-					C = 0;
-					F = 0;
-				end
-			end
+			
 			4'b0001: begin //SUB or SUBI
 			result = a - b; 
 				if (result > b) begin
@@ -65,6 +55,18 @@ module alu(a, b, aluControl, C, L, F, Z, N, result);
 			end
 			4'b0111: begin //MOVI
 				result = b;
+			end
+			
+			4'b1000: begin //ADD or ADDI
+				result = a + b; 
+				if (result < b || result < a) begin
+					C = 1;
+					F = 1;
+				end
+				else begin 
+					C = 0;
+					F = 0;
+				end
 			end
 			default: begin
 				C = 0;

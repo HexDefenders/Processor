@@ -17,7 +17,7 @@ module tb_alu();
 		// ADD or ADDI
 		a = 16'h0003;
 		b = 16'h0001;
-		aluControl = 4'b0000; 
+		aluControl = 4'b1000; 
 		$display("here"); 
 		//if (result == 16'h0004) 
 		//	$display("ADD ERROR");

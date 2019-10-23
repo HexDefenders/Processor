@@ -1,10 +1,11 @@
-module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, regFileResultCont, memread, memwrite, writedata);
+module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstRegEn, immRegEn, 
+						resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, exMemResultEn, memread, memwrite);
 	input clk, reset;
 	input [15:0] instruction;
 	output reg [3:0] aluControl;
-	output reg [1:0] pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, regFileResultCont;
+	output reg [1:0] pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, 
+							exMemResultEn;
 	output reg memread, memwrite;
-	output reg [15:0] writedata;
 	reg [5:0] PS, NS;
 	parameter [5:0] S0 = 6'd0, S1 = 6'd1, S2 = 6'd2, S3 = 6'd3, S4 = 6'd4, S5 = 6'd5, S6 = 6'd6, S7 = 6'd7, S8 = 6'd8, S9 = 6'd9, S10 = 6'd10, 
 						 S11 = 6'd11, S12 = 6'd12, S13 = 6'd13, S14 = 6'd14, S15 = 6'd15, S16 = 6'd16, S17 = 6'd17, S18 = 6'd18, S19 = 6'd19, S20 = 6'd20,
@@ -21,7 +22,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 	
 	always@(*) begin
 		// initialize control signals
-		{pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, resultRegEn} <= 0;
+		{pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, resultRegEn, exMemResultEn, memread, memwrite, aluControl} <= 0;
 		
 		case(instruction)
 			S0: begin
@@ -133,7 +134,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				regFileEn <= 1;
 				pcRegMuxEn <= 1;
 				mux4En <= 0;
-				aluControl <= 0000;
+				aluControl <= 1000;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
 				NS <= 0; 
@@ -203,14 +204,14 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				regFileEn <= 1;
 				memread <= 1;
 				memwrite <= 0;
-				writedata <= 1;
+				exMemResultEn <= 1;
 			end
 			
 			S9: begin // STOR
 				regFileEn <= 0;
 				memread <= 0;
 				memwrite <= 1;
-				writedata <= 1;
+				exMemResultEn <= 1;
 			end
 			
 			S10: begin // JAL
