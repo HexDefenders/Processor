@@ -12,7 +12,13 @@ module alu(a, b, aluControl, C, L, F, Z, N, result);
 		N = 0;
 		result = 4'd0;
 		case(aluControl) 
-			
+			4'b0000: begin
+				C = 0;
+				L = 0;
+				F = 0;
+				Z = 0; 
+				N = 0;
+			end
 			4'b0001: begin //SUB or SUBI
 			result = a - b; 
 				if (result > b) begin

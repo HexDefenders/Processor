@@ -8,8 +8,8 @@ module exmem #(parameter WIDTH = 16, RAM_ADDR_BITS = 16)
     output reg [WIDTH-1:0] memdata
     );
 
-   reg [WIDTH-1:0] ram [(2**RAM_ADDR_BITS)-1:0];
-
+   reg [WIDTH-1:0] ram [(2*RAM_ADDR_BITS)-1:0];
+	
  //initial
 
  // The following $readmemh statement is only necessary if you wish
@@ -27,12 +27,19 @@ module exmem #(parameter WIDTH = 16, RAM_ADDR_BITS = 16)
  // to keep in mind when you're using the RAM in your system! 
  
    //I think in lab 2 "en" was like memread since we were always reading from memory except if reading form swtiches. look at mini_mips.v...
-   always @(posedge clk) 
+//	initial begin
+//			ram[16'h0] = 16'h1; // address
+//			ram[16'h1] = 16'h4; // value
+//	end
+	
+	always @(posedge clk) begin
+ 
       if (en) begin
          if (memwrite)
             ram[adr] <= writedata;
 			if (memread)
 				memdata <= ram[adr];
       end
+	end
 						
 endmodule
