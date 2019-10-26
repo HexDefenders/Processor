@@ -33,7 +33,6 @@ module exmem #(parameter WIDTH = 16, RAM_ADDR_BITS = 16)
 //	end
 	
 	always @(posedge clk) begin
- 
       if (en) begin
          if (memwrite)
             ram[adr] <= writedata;

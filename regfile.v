@@ -11,9 +11,9 @@ module regfile(clk, regwrite, ra1, ra2, wd, rd1, rd2);
 			RAM[ra2] <= wd; // One of the read addresses is also the write address
 	
 	initial begin
-			RAM[16'h0] = 16'h1; // address
-			RAM[16'h1] = 16'h4; // value
-			RAM[16'h2] = 16'h3; // value
+			RAM[16'h1] = 16'h2; // address
+			RAM[16'h2] = 16'h4; // value
+			RAM[16'h3] = 16'h3; // value
 	end
 	
 	assign rd1 = ra1 ? RAM[ra1] : 16'b0;

@@ -147,7 +147,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				aluControl <= 4'b1000;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
-				NS <= 0; 
+				NS <= S0; 
 			end
 			
 			S2: begin // SUB
