@@ -34,7 +34,7 @@ module dataPath(clk, instruction, memdata, aluControl, exMemResultEn, pcRegEn, s
 	
 	mux4 toALUMux(dstData, signOut, 1, 0, mux4En, mux4Out);
 	
-	alu ALU(pcOrReg, mux4Out, aluControl, C, L, F, Z, N, aluResult);
+	alu ALU(mux4Out, pcOrReg, aluControl, C, L, F, Z, N, aluResult);
 	
 	mux2 regOrImmMux(srcData, signOut, regImmMuxEn, regOrImm);
 	

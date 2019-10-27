@@ -60,6 +60,8 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 						NS <= S6;
 					end
 					else if (instruction[7:4] == 4'b1101) begin // MOV
+						srcRegEn <= 1;
+						dstRegEn <= 1;
 						NS <= S7;
 					end
 				end

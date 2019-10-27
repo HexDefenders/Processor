@@ -57,10 +57,10 @@ module alu(a, b, aluControl, C, L, F, Z, N, result);
 				result = a ^ b; 
 			end
 			4'b0110: begin //MOV
-				result = a; 
+				result = b; 
 			end
 			4'b0111: begin //MOVI
-				result = b;
+				result = a;
 			end
 			
 			4'b1000: begin //ADD or ADDI
