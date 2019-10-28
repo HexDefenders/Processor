@@ -20,7 +20,7 @@ module alu(a, b, aluControl, C, L, F, Z, N, result);
 				N = 0;
 			end
 			4'b0001: begin //SUB or SUBI
-			result = a - b; 
+			result = b - a; 
 				if (result > b) begin
 					C = 1;
 					F = 1;
@@ -31,7 +31,7 @@ module alu(a, b, aluControl, C, L, F, Z, N, result);
 				end
 			end
 			4'b0010: begin //CMP or CMPI
-				if (a < b) begin
+				if (b < a) begin
 					L = 1;
 					N = 1;
 					Z = 0;
@@ -57,10 +57,10 @@ module alu(a, b, aluControl, C, L, F, Z, N, result);
 				result = a ^ b; 
 			end
 			4'b0110: begin //MOV
-				result = b; 
+				result = a; 
 			end
 			4'b0111: begin //MOVI
-				result = a;
+				result = b;
 			end
 			
 			4'b1000: begin //ADD or ADDI

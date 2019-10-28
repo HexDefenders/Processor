@@ -11,7 +11,7 @@ module instructionRegister(inst, s, OpCode, Rdest, OpCodeExt, Rsrc, imm);
 		if (s == 1) begin // uses immediate
 			OpCodeExt <= 0;
 			Rsrc <= 0;
-			imm <= inst [7:0];
+			imm <= inst[7:0];
 		end
 		else begin // uses Rsrc
 			OpCodeExt <= inst[7:4];
