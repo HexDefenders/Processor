@@ -4,8 +4,8 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 	input [15:0] instruction;
 	output reg [3:0] aluControl;
 	output reg pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, shiftALUMuxEn, regImmMuxEn, 
-							exMemResultEn, memread, memwrite, pcEn, irS;
-	output reg [1:0] mux4En, regpcCont;
+							exMemResultEn, memread, memwrite, irS;
+	output reg [1:0] mux4En, regpcCont, pcEn;
 	reg [5:0] PS, NS;
 	parameter [5:0] FETCH = 6'd0, DECODE = 6'd1, ADD = 6'd2, SUB = 6'd3, CMP = 6'd4, AND = 6'd5, OR = 6'd6, XOR = 6'd7, MOV = 6'd8, LOAD = 6'd9, STOR = 6'd10, 
 						 JAL = 6'd11, JCOND = 6'd12, LSH = 6'd13, LSHI = 6'd14, S15 = 6'd15, BCOND = 6'd16, ANDI = 6'd17, ORI = 6'd18, XORI = 6'd19, ADDI = 6'd20,
@@ -19,23 +19,19 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 	always@(*) begin
 		// initialize control signals
 		{pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, 
-		shiftALUMuxEn, regImmMuxEn, resultRegEn, exMemResultEn, memread, memwrite, pcEn, irS} <= 1'd0;
+		shiftALUMuxEn, regImmMuxEn, resultRegEn, exMemResultEn, memread, memwrite, irS} <= 1'd0;
 		aluControl = 4'b0;
-		{mux4En, regpcCont} = 2'b0;
+		{mux4En, regpcCont, pcEn} <= 3'b0;
 		NS = 6'b0;
 		
 		case(PS)
 			FETCH: begin // FETCH
 				pcRegEn <= 1;
-				pcEn <= 1;
 				memread <= 1;
 				NS <= DECODE;
 			end
 			
 			DECODE: begin // DECODE
-				// Update pc
-				pcEn <= 1;
-				
 				if (instruction[15:12] == 0000) begin // Register
 					if (instruction[7:4] == 4'b0101) begin // ADD
 						srcRegEn <= 1;
@@ -169,6 +165,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				aluControl <= 4'b1000;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH; 
 			end
 			
@@ -179,6 +176,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				aluControl <= 4'b0001;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH; 
 			end
 			
@@ -189,6 +187,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				aluControl <= 4'b0010;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH;
 			end
 			
@@ -199,6 +198,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				aluControl <= 4'b0011;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH; 
 			end
 			
@@ -209,6 +209,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				aluControl <= 4'b0100;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH;
 			end
 			
@@ -219,6 +220,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				aluControl <= 4'b0101;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH;
 			end
 			
@@ -229,6 +231,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				aluControl <= 4'b0110;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH;
 			end
 			
@@ -237,6 +240,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				memread <= 1;
 				memwrite <= 0;
 				exMemResultEn <= 1;
+				pcEn <= 2'b01;
 			end
 			
 			STOR: begin // STOR
@@ -244,14 +248,17 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				memread <= 0;
 				memwrite <= 1;
 				exMemResultEn <= 1;
+				pcEn <= 2'b01;
 			end
 			
 			JAL: begin // JAL
-				
+				//add more to this
+				pcEn <= 2'b10;
 				NS <= FETCH; 
 			end
 			
 			JCOND: begin // Jcond
+				pcEn <= 2'b10;
 				NS <= FETCH; 
 			end
 			
@@ -268,6 +275,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 			end
 			
 			BCOND: begin // Bcond
+				pcEn <= 2'b11;
 				NS <= FETCH; 
 			end
 			
@@ -279,6 +287,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
 				irS <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH; 
 			end
 			
@@ -290,6 +299,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
 				irS <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH;
 			end
 			
@@ -301,6 +311,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				shiftALUMuxEn <=0;
 				resultRegEn <= 1;
 				irS <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH;
 			end
 			
@@ -312,6 +323,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
 				irS <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH; 
 			end
 			
@@ -323,6 +335,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
 				irS <= 1;
+				pcEn <= 2'b00;
 				NS <= FETCH; 
 			end
 			
@@ -334,6 +347,7 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
 				irS <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH;
 			end
 			
@@ -345,11 +359,13 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
 				irS <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH;
 			end
 			
 			LUI: begin // LUI
 				irS <= 1;
+				pcEn <= 2'b01;
 				NS <= FETCH;
 			end
 			
