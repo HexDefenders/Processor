@@ -2,14 +2,15 @@ module tb_statemachine();
 	reg clk, reset;
 	reg [15:0] instruction;
 	wire [3:0] aluControl;
-	wire [1:0] pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn;
+	wire pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, 
+			mux4En, shiftALUMuxEn, regImmMuxEn, memRead, memwrite,pcEn;
 	
 	statemachine uut(
 		.clk(clk), .reset(reset), .instruction(instruction), .aluControl(aluControl), 
 		.pcRegEn(pcRegEn), .srcRegEn(srcRegEn), .dstRegEn(dstRegEn), .immRegEn(immRegEn), 
 		.resultRegEn(resultRegEn), .signEn(signEn), .regFileEn(regFileEn), .pcRegMuxEn(pcRegMuxEn), 
 		.mux4En(mux4En), .shiftALUMuxEn(shiftALUMuxEn), .regImmMuxEn(regImmMuxEn), .memread(memRead), 
-		.memwrite(memwrite), .writedata(writedata)
+		.memwrite(memwrite), .pcEn(pcEn)
 	);
 	
 	initial begin

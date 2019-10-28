@@ -6,21 +6,22 @@ module top(clk, rst, instruction); //add I/O devices to this list later on
 	wire memread, memwrite;
 	wire [15:0] memdata, adr, writedata, instruction, srcData, dstData;
 	wire [3:0] aluControl;
-	wire [1:0] mux4En;
-	wire pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, shiftALUMuxEn, regImmMuxEn, exMemResultEn;
+	wire [1:0] mux4En, regpcCont;
+	wire pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, shiftALUMuxEn, regImmMuxEn, exMemResultEn, pcEn;
 	wire en;
 	
 	
 	statemachine SM(.clk(clk), .reset(rst), .instruction(instruction), .aluControl(aluControl), .pcRegEn(pcRegEn), .srcRegEn(srcRegEn), .dstRegEn(dstRegEn), .immRegEn(immRegEn), 
-						.resultRegEn(resultRegEn), .signEn(signEn), .regFileEn(regFileEn), .pcRegMuxEn(pcRegMuxEn), .mux4En(mux4En), .shiftALUMuxEn(shiftALUMuxEn), .regImmMuxEn(regImmMuxEn), .exMemResultEn(exMemResultEn),
-						.memread(memread), .memwrite(memwrite));
+						.resultRegEn(resultRegEn), .signEn(signEn), .regFileEn(regFileEn), .pcRegMuxEn(pcRegMuxEn), .mux4En(mux4En), .shiftALUMuxEn(shiftALUMuxEn), 
+						.regImmMuxEn(regImmMuxEn), .exMemResultEn(exMemResultEn), .memread(memread), .memwrite(memwrite), .pcEn(pcEn), .regpcCont(regpcCont));
 						
-	dataPath DP(.clk(clk), .instruction(instruction), .memdata(memdata), .aluControl(aluControl), .exMemResultEn(exMemResultEn), .pcRegEn(pcRegEn), .srcRegEn(srcRegEn), .dstRegEn(dstRegEn), .immRegEn(immRegEn), .resultRegEn(resultRegEn), 
-					.signEn(signEn), .regFileEn(regFileEn), .pcRegMuxEn(pcRegMuxEn), .mux4En(mux4En), .shiftALUMuxEn(shiftALUMuxEn), .regImmMuxEn(regImmMuxEn), .srcData(srcData), .dstData(dstData));
+	dataPath DP(.clk(clk), .instruction(instruction), .memdata(memdata), .aluControl(aluControl), .exMemResultEn(exMemResultEn), .pcRegEn(pcRegEn), .srcRegEn(srcRegEn), 
+					.dstRegEn(dstRegEn), .immRegEn(immRegEn), .resultRegEn(resultRegEn), .signEn(signEn), .regFileEn(regFileEn), .pcRegMuxEn(pcRegMuxEn), .mux4En(mux4En), 
+					.shiftALUMuxEn(shiftALUMuxEn), .regImmMuxEn(regImmMuxEn), .regpcCont(regpcCont), .srcData(srcData), .dstData(dstData), .adr(adr));
 		
 	assign en = 1;
 	//clk = ~clk??
-	exmem mem(.clk(~clk), .en(en), .memwrite(memwrite), .memread(memread), .adr(srcData), .writedata(dstData), .memdata(memdata));
+	exmem mem(.clk(~clk), .en(en), .memwrite(memwrite), .memread(memread), .adr(adr), .writedata(dstData), .memdata(memdata));
 	
 	//Initializing when in I/O space. Adr is 16 bits, I/O space = if top two bits are 11 (NEEDS TO BE CHANGED LATER!!!!!!!!!!!!!)
 //	always @(adr)

@@ -1,21 +1,22 @@
-module dataPath(clk, instruction, memdata, aluControl, exMemResultEn, pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, 
-					 regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, srcData, dstData);
-	input clk;
+module dataPath(clk, reset, instruction, memdata, aluControl, exMemResultEn, pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, 
+					 regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, regpcCont, srcData, dstData, adr);
+	input clk, reset;
 	input [15:0] instruction, memdata;
 	input [3:0] aluControl;
 	//why are some mux 2 control signals 2 bits?
-	input [1:0] pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, regImmMuxEn, 
+	input pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, shiftALUMuxEn, regImmMuxEn, 
 					exMemResultEn;
-	wire pc, imm;
-	wire [3:0] src, dst, Rsrc, Rdest, OpCode, OpCodeExt;
+	input [1:0] mux4En, regpcCont;
+	wire [15:0] pc;
+	wire [3:0] src, dst, imm, Rsrc, Rdest, OpCode, OpCodeExt;
 	wire [15:0] result, exMemOrResult, shiftOrALU, regFileResult, signOut, pcOrReg, mux4Out, aluResult, regOrImm, shiftOut;
 	wire [7:0] instImm;
 	wire C, L, F, Z, N, s;
-	output [15:0] srcData, dstData;
+	output [15:0] srcData, dstData, adr;
 	
-	instructionRegister instructionRegister(instruction, s, OpCode, Rdest, OpCodeExt, Rsrc, instImm);
+	instructionRegister instructionRegister(.inst(instruction), .s(s), .OpCode(OpCode), .Rdest(Rdest), .OpCodeExt(OpCodeExt), .Rsrc(Rsrc), .imm(instImm));
 	
-	register pcReg(.D(shiftOrALU), .En(pcRegEn), .clk(clk), .Q(pc)); // program counter
+	register pcReg(.D(aluResult), .En(pcRegEn), .clk(clk), .Q(pc)); // program counter
 	register srcReg(.D(Rsrc), .En(srcRegEn), .clk(clk), .Q(src)); // src
 	register dstReg(.D(Rdest), .En(dstRegEn), .clk(clk), .Q(dst)); // dst
 	register immReg(.D(instImm), .En(immRegEn), .clk(clk), .Q(imm)); // imm
@@ -26,22 +27,22 @@ module dataPath(clk, instruction, memdata, aluControl, exMemResultEn, pcRegEn, s
 	//mux4 RegFileResult(.d0(result), .d1(memdata), .d2(0), .d3(1), .s(regFileResultCont), .y(regFileResult));
 	mux2 exMemOrResultMux(.d0(result), .d1(memdata), .s(exMemResultEn), .y(regFileResult));
 	
-	regfile regFile(clk, regFileEn, src, dst, regFileResult, srcData, dstData);
+	regfile regFile(.clk(clk), .regwrite(regFileEn), .ra1(src), .ra2(dst), .wd(regFileResult), .rd1(srcData), .rd2(dstData));
 	
-	signExtend signExtend(imm, signEn, signOut);
+	signExtend signExtend(.in(imm), .s(signEn), .out(signOut));
 	
-	mux2 pcOrRegMux(pc, srcData, pcRegMuxEn, pcOrReg);
+	mux2 pcOrRegMux(.d0(pc), .d1(srcData), .s(pcRegMuxEn), .y(pcOrReg));
 	
-	mux4 toALUMux(dstData, signOut, 1, 0, mux4En, mux4Out);
+	mux4 toALUMux(.d0(dstData), .d1(signOut), .d2(1), .d3(0), .s(mux4En), .y(mux4Out));
 	
-	alu ALU(mux4Out, pcOrReg, aluControl, C, L, F, Z, N, aluResult);
+	alu ALU(.a(mux4Out), .b(pcOrReg), .aluControl(aluControl), .C(C), .L(L), .F(F), .Z(Z), .N(N), .result(aluResult));
 	
-	mux2 regOrImmMux(srcData, signOut, regImmMuxEn, regOrImm);
+	mux2 regOrImmMux(.d0(srcData), .d1(signOut), .s(regImmMuxEn), .y(regOrImm));
 	
-	shifter shifter(dstData, regOrImm, shiftOut);
+	shifter shifter(.in(dstData), .s(regOrImm), .out(shiftOut));
 	
-	mux2 shiftOrALUMux(aluResult, shiftOut, shiftALUMuxEn, shiftOrALU);
+	mux2 shiftOrALUMux(.d0(aluResult), .d1(shiftOut), .s(shiftALUMuxEn), .y(shiftOrALU));
 	
-	
+	mux4 srcRegOrPCMux(.d0(srcData), .d1(pc), .d2(result), .d3(0), .s(regpcCont), .y(adr));
 
 endmodule 
