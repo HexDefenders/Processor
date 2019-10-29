@@ -23,8 +23,12 @@ module exmem #(parameter WIDTH = 16, RAM_ADDR_BITS = 16)
  // synthesize correctly, fib.dat must have exactly 256 lines
  // (bytes). If that's the case, then the resulting bitstream will
  // correctly initialize the synthesized block RAM with the data. 
- $readmemh("C:\\Users\\u1014583\\Documents\\HexDefenders\\Processor\\new_test.dat", ram);
-
+ 
+ // Kris' Path
+ //$readmemh("C:\\Users\\u1014583\\Documents\\HexDefenders\\Processor\\new_test.dat", ram);
+ // Cameron's Path
+ $readmemh("C:\\intelFPGA_lite\\18.1\\Processor\\new_test.dat", ram);
+ 
  // This "always" block simulates as a RAM, and synthesizes to a block
  // RAM on the Spartan-3E part. Note that the RAM is clocked. Reading
  // and writing happen on the rising clock edge. This is very important

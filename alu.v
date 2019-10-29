@@ -56,12 +56,13 @@ module alu(a, b, aluControl, C, L, F, Z, N, result);
 			4'b0101: begin //XOR or XORI
 				result = a ^ b; 
 			end
-			4'b0110: begin //MOV
-				result = a; 
-			end
-			4'b0111: begin //MOVI
-				result = b;
-			end
+			
+			//4'b0110: begin //MOV
+			//	result = a; 
+			//end
+			//4'b0111: begin //MOVI
+			//	result = b;
+			//end
 			
 			4'b1000: begin //ADD or ADDI
 				result = a + b; 

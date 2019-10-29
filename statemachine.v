@@ -4,8 +4,8 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 	input [15:0] instruction;
 	output reg [3:0] aluControl;
 	output reg pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, shiftALUMuxEn, regImmMuxEn, 
-							exMemResultEn, memread, memwrite, irS;
-	output reg [1:0] mux4En, regpcCont, pcEn;
+							memread, memwrite, irS;
+	output reg [1:0] mux4En, regpcCont, pcEn, exMemResultEn;
 	reg [5:0] PS, NS;
 	parameter [5:0] FETCH = 6'd0, DECODE = 6'd1, ADD = 6'd2, SUB = 6'd3, CMP = 6'd4, AND = 6'd5, OR = 6'd6, XOR = 6'd7, MOV = 6'd8, LOAD = 6'd9, STOR = 6'd10, 
 						 JAL = 6'd11, JCOND = 6'd12, LSH = 6'd13, LSHI = 6'd14, S15 = 6'd15, BCOND = 6'd16, ANDI = 6'd17, ORI = 6'd18, XORI = 6'd19, ADDI = 6'd20,
@@ -19,9 +19,9 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 	always@(*) begin
 		// initialize control signals
 		{pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, 
-		shiftALUMuxEn, regImmMuxEn, resultRegEn, exMemResultEn, memread, memwrite, irS} <= 1'd0;
+		shiftALUMuxEn, regImmMuxEn, resultRegEn, , memread, memwrite, irS} <= 1'd0;
 		aluControl = 4'b0;
-		{mux4En, regpcCont, pcEn} <= 3'b0;
+		{mux4En, regpcCont, pcEn, exMemResultEn} <= 2'b0;
 		NS = 6'b0;
 		
 		case(PS)
@@ -228,10 +228,11 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				regFileEn <= 1;
 				pcRegMuxEn <= 1;
 				mux4En <= 0;
-				aluControl <= 4'b0110;
+				//aluControl <= 4'b0110;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
 				pcEn <= 2'b01;
+				exMemResultEn <= 2'b10;
 				NS <= FETCH;
 			end
 			
@@ -355,11 +356,12 @@ module statemachine(clk, reset, instruction, aluControl, pcRegEn, srcRegEn, dstR
 				regFileEn <= 1;
 				pcRegMuxEn <= 1;
 				mux4En <= 01;
-				aluControl <= 4'b0011;
+				//aluControl <= 4'b0011;
 				shiftALUMuxEn <= 0;
 				resultRegEn <= 1;
 				irS <= 1;
 				pcEn <= 2'b01;
+				exMemResultEn <= 2'b10;
 				NS <= FETCH;
 			end
 			
