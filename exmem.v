@@ -27,7 +27,7 @@ module exmem #(parameter WIDTH = 16, RAM_ADDR_BITS = 16)
  // Kris' Path
  //$readmemh("C:\\Users\\u1014583\\Documents\\HexDefenders\\Processor\\new_test.dat", ram);
  // Cameron's Path
- $readmemh("C:\\intelFPGA_lite\\18.1\\Processor\\new_test.dat", ram);
+ $readmemh("C:\\intelFPGA_lite\\18.1\\Processor\\testfile.dat", ram);
  
  // This "always" block simulates as a RAM, and synthesizes to a block
  // RAM on the Spartan-3E part. Note that the RAM is clocked. Reading

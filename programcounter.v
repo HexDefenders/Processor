@@ -8,13 +8,20 @@ module programcounter(clk, en, newAdr, imm, nextpc);
 	//reg [3:0] currentpc = 4'b0;
 	
 	always@(posedge clk) begin
-		if(en == 2'b01)
-			nextpc <= nextpc + 1'b1;
-		else if(en == 2'b10)
-			nextpc <= newAdr;
-		else if(en == 2'b11)
-			nextpc <= nextpc + imm; //check for negative displacement
-		else
-			nextpc <= nextpc;
+		case(en)
+			2'b01: nextpc <= nextpc + 1'b1; // most instructions
+			2'b10: nextpc <= newAdr; // jumps
+			2'b11: nextpc <= nextpc + imm; // branches
+			default: nextpc <= nextpc;
+		endcase
+		
+		//if(en == 2'b01)
+		//	nextpc <= nextpc + 1'b1;
+		//else if(en == 2'b10)
+		//	nextpc <= newAdr;
+		//else if(en == 2'b11)
+		//	nextpc <= nextpc + imm; //check for negative displacement
+		//else
+		//	nextpc <= nextpc;
 	end
 endmodule 

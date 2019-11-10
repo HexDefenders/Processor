@@ -23,14 +23,14 @@ module dataPath(clk, reset, memdata, instruction, aluControl, exMemResultEn, pcR
 	register srcReg(.D({12'b0, Rsrc}), .En(srcRegEn), .clk(clk), .Q(src)); // src
 	register dstReg(.D({12'b0, Rdest}), .En(dstRegEn), .clk(clk), .Q(dst)); // dst
 	register immReg(.D({8'b0, instImm}), .En(immRegEn), .clk(clk), .Q(imm)); // imm
-	register resultReg(.D(shiftOrALU), .En(resultRegEn), .clk(clk), .Q(result)); // result
+	//register resultReg(.D(shiftOrALU), .En(resultRegEn), .clk(clk), .Q(result)); // result
 	
 	//Mux to choose regfile's write data
 	//Note: d2 and d3 are extra inputs for testing and debugging
 	//mux4 RegFileResult(.d0(result), .d1(memdata), .d2(0), .d3(1), .s(regFileResultCont), .y(regFileResult));
 	
 	// Changed to add MOV/MOVI input
-	mux4 exMemOrResultMux(.d0(result), .d1(memdata), .d2(mux4Out), .d3(0), .s(exMemResultEn), .y(regFileResult));
+	mux4 exMemOrResultMux(.d0(shiftOrALU), .d1(memdata), .d2(mux4Out), .d3(0), .s(exMemResultEn), .y(regFileResult));
 	
 	regfile regFile(.clk(clk), .regwrite(regFileEn), .ra1(src), .ra2(dst), .wd(regFileResult), .rd1(srcData), .rd2(dstData));
 	
@@ -40,7 +40,7 @@ module dataPath(clk, reset, memdata, instruction, aluControl, exMemResultEn, pcR
 	
 	mux4 toALUMux(.d0(srcData), .d1(signOut), .d2(1), .d3(0), .s(mux4En), .y(mux4Out));
 	
-	alu ALU(.a(mux4Out), .b(pcOrReg), .aluControl(aluControl), .C(C), .L(L), .F(F), .Z(Z), .N(N), .result(aluResult));
+	alu ALU(.a(mux4Out), .b(dstData), .aluControl(aluControl), .C(C), .L(L), .F(F), .Z(Z), .N(N), .result(aluResult));
 	
 	mux2 regOrImmMux(.d0(srcData), .d1(signOut), .s(regImmMuxEn), .y(regOrImm));
 	
