@@ -5,31 +5,21 @@ module alu(a, b, aluControl, C, L, F, Z, N, result);
 	output reg [15:0] result;
 	
 	always@(*) begin
-		C = 0;
-		L = 0;
-		F = 0;
-		Z = 0; 
-		N = 0;
+		{C, L, F, Z, N} = 0;
 		result = 4'd0;
+		
 		case(aluControl) 
-			4'b0000: begin
-				C = 0;
-				L = 0;
-				F = 0;
-				Z = 0; 
-				N = 0;
-			end
+			4'b0000: // Empty case
+				{C, L, F, Z, N} <= 0;
+			
 			4'b0001: begin //SUB or SUBI
 			result = b - a; 
-				if (result > b) begin
-					C = 1;
-					F = 1;
-				end
-				else begin
-					C = 0;
-					F = 0;
-				end
+				if (result > b)
+					{C, F} = 1;
+				else 
+					{C, F} = 0;
 			end
+			
 			4'b0010: begin //CMP or CMPI
 				if (b < a) begin
 					L = 1;
@@ -41,48 +31,37 @@ module alu(a, b, aluControl, C, L, F, Z, N, result);
 					N = 0;
 					Z = 1;
 				end
-				else begin
-					L = 0;
-					N = 0;
-					Z = 0;
-				end
-			end
-			4'b0011: begin //AND or ANDI
-				result = a & b; 	
-			end
-			4'b0100: begin //OR or ORI
-				result = a | b;
-			end
-			4'b0101: begin //XOR or XORI
-				result = a ^ b; 
+				else 
+					{L, Z, N} = 0;
 			end
 			
-			4'b0110: begin //LUI
+			4'b0011: //AND or ANDI
+				result = a & b; 	
+				
+			4'b0100: //OR or ORI
+				result = a | b;
+			
+			4'b0101: //XOR or XORI
+				result = a ^ b; 
+			
+			4'b0110: //LUI
 				result = {a[7:0], b[7:0]};	
-			end
+			
 			//4'b0111: begin //MOVI
 			//	result = b;
 			//end
 			
 			4'b1000: begin //ADD or ADDI
 				result = a + b; 
-				if (result < b || result < a) begin
-					C = 1;
-					F = 1;
-				end
-				else begin 
-					C = 0;
-					F = 0;
-				end
+				if (result < b || result < a)
+					{C, F} = 1;
+				else
+					{C, F} = 0;
 			end
 			
-			default: begin
-				C = 0;
-				L = 0;
-				F = 0;
-				Z = 0; 
-				N = 0;
-			end
+			default:
+				{C, L, F, Z, N} = 0;
+				
 		endcase
 	end
 endmodule

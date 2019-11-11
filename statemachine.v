@@ -20,8 +20,8 @@ module statemachine(clk, reset, C, L, F, Z, N, instruction, aluControl, pcRegEn,
 		// initialize control signals
 		{pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, regFileEn, pcRegMuxEn, 
 		shiftALUMuxEn, regImmMuxEn, resultRegEn, memread, memwrite, irS} <= 1'd0;
-		aluControl = 4'b0;
 		{mux4En, regpcCont, pcEn, exMemResultEn} <= 2'b0;
+		aluControl = 4'b0;
 		NS = 6'b0;
 		
 		case(PS)

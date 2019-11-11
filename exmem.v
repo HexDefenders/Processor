@@ -5,7 +5,7 @@ module exmem #(parameter WIDTH = 16, RAM_ADDR_BITS = 16)
     input memwrite, memread,
     input [RAM_ADDR_BITS-1:0] adr,
     input [WIDTH-1:0] writedata,
-	 input [3:0] pc,
+	 input [15:0] pc,
     output reg [WIDTH-1:0] memdata,
 	 output reg [WIDTH-1:0] instruction
 	 //output reg [WIDTH-1:0] playerInputVal,
