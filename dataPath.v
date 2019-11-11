@@ -1,5 +1,5 @@
 module dataPath(clk, reset, memdata, instruction, aluControl, exMemResultEn, pcRegEn, srcRegEn, dstRegEn, immRegEn, resultRegEn, signEn, 
-					 regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, irS, regImmMuxEn, regpcCont, srcData, dstData, adr, signOut);
+					 regFileEn, pcRegMuxEn, mux4En, shiftALUMuxEn, irS, regImmMuxEn, regpcCont, srcData, dstData, adr, signOut, C, L, F, Z, N);
 	input clk, reset;
 	input [15:0] instruction, memdata;
 	input [3:0] aluControl;
@@ -11,6 +11,7 @@ module dataPath(clk, reset, memdata, instruction, aluControl, exMemResultEn, pcR
 	wire [7:0] instImm, imm;
 	wire C, L, F, Z, N;
 	output [15:0] srcData, dstData, adr, signOut;
+	output C, L, F, Z, N;
 	//output [3:0] pc;
 	
 	/* FOR TESTING */
